@@ -42,21 +42,22 @@ package jp.maaash.ObjectDetection
 		public  var cascade   :HaarCascade;
 		private var _options  :ObjectDetectorOptions;
 		
+		
 		public function ObjectDetector() {
 			tgt = new TargetImage();
 			cascade = new HaarCascade();
 		}
 
-		public function detect( bmp:BitmapData ) :void{
+		public function detect( bmp:BitmapData ) :Boolean{
 			if ( bmp  ) {
 				tgt.bitmapData = bmp;
 			}
 
 			dispatchEvent( new ObjectDetectorEvent(ObjectDetectorEvent.DETECTION_START) );
-			_detect();
+			return(_detect());
 		}
 
-		private function _detect() :void {
+		private function _detect() :Boolean {
 
 			cascade.targetImage = tgt;
 			
@@ -64,7 +65,7 @@ package jp.maaash.ObjectDetection
 			var imgw :int = tgt.width, imgh :int = tgt.height;
 			var scaledw :int, scaledh :int, limitx  :int, limity  :int, stepx :int, stepy :int, result :int, factor:Number = 1;
 			var checkRect:Rectangle = new Rectangle();
-			
+			var detect:Boolean=false;
 			for( factor = 1;
 				factor * cascade.base_window_w < imgw && factor * cascade.base_window_h < imgh;
 				factor *= _options.scale_factor )
@@ -110,6 +111,7 @@ package jp.maaash.ObjectDetection
 							if ( result > 0 ) {
 								//var faceArea :Rectangle = checkRect.clone();
 								detected.push( checkRect.clone() );
+								detect=true;
 								//logger("[createCheckAndRun]found!: "+ix+","+iy+","+scaledw+","+scaledh);
 
 								// doesnt mean anything cause detection is not time-divided (now)
@@ -129,6 +131,7 @@ package jp.maaash.ObjectDetection
 			var ev2 :ObjectDetectorEvent = new ObjectDetectorEvent( ObjectDetectorEvent.DETECTION_COMPLETE );
 			ev2.rects = detected;
 			dispatchEvent( ev2 );
+			return detect;
 		}
 
 		private function overlaps( rect:Rectangle):Boolean

@@ -7,12 +7,8 @@
 
 
 	</mx:Canvas>
-	<mx:Script>
-		<![CDATA[
-			import mx.controls.Alert;
-		]]>
-	</mx:Script>
-		<mx:Button x="23" y="10" label="Saluda" id="but" width="154" height="96" click="Alert.show('Hola')"/>
+
+		<mx:Button x="23" y="10" label="Saluda" id="but" width="154" height="96"/>
 		<mx:Button x="269" y="23" label="Bot2" id="but2" width="164" height="74"/>
 		<mx:Button x="514" y="49" label="Bot3" id="but3"/>
 		
