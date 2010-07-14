@@ -66,9 +66,10 @@ private function setupCamera():void
 	mc=new UIComponent();
 	mc.width=vid.width;
 	mc.height=vid.height;
-	//mc.addChild(vid);
+	mc.addChild(vid);
 	paint = new BitmapData(vid.width, vid.height);
 	bm=new Bitmap();
+	bm.visible=false;
 	bm.bitmapData=currentCap;
 	mc.addChild(vid);
 	mc.addChild(bm);

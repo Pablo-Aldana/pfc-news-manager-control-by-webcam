@@ -2,19 +2,21 @@ import collision.CollisionGroup;
 
 import flash.display.Bitmap;
 import flash.display.BitmapData;
+import flash.display.Graphics;
 import flash.display.Shape;
+import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.geom.Matrix;
+import flash.geom.Rectangle;
 import flash.media.Camera;
 import flash.media.Video;
-import flash.display.Graphics;
-import flash.display.Sprite;
-import flash.geom.Rectangle;
-import mx.core.UIComponent;
+
 import jp.maaash.ObjectDetection.ObjectDetector;
 import jp.maaash.ObjectDetection.ObjectDetectorEvent;
 import jp.maaash.ObjectDetection.ObjectDetectorOptions;
+
+import mx.core.UIComponent;
 	
 
 [SWF(width="640", height="480", frameRate="30", backgroundColor="#FFFFFF")]
@@ -55,7 +57,8 @@ private var colisiones:int;
 		private var h:int = 480;
 		
 		private var lastTimer:int = 0;
-		
+		private var detectionCountCheck:Boolean= false;
+	
 		
 public function AirToyX():void
 {
@@ -71,7 +74,7 @@ private function setupCamera():void
 	cam = Camera.getCamera();
 	cam.setMode(640, 480, 30);
 	vid.attachCamera(cam);
-	vid.addEventListener( Event.RENDER, cameraReadyHandler );
+	//vid.addEventListener( Event.RENDER, cameraReadyHandler );
 	///////
 	matr = new Matrix();
 	matr.scale((vid.scaleX/100), (vid.scaleY/100));
@@ -83,13 +86,13 @@ private function setupCamera():void
 	mc.height=vid.height;
 	paint = new BitmapData(vid.width, vid.height);
 	bm=new Bitmap();
+	bm.visible=false;
 	bm.bitmapData=currentCap;
 	mc.addChild(vid);
 	mc.addChild(bm);
 	// begin facial recognition
 	detectionMap = new BitmapData(w/scaleFactor, h/scaleFactor,false,0 );
 	drawMatrix = new Matrix(1/scaleFactor, 0, 0, 1/scaleFactor );
-			trace(detectionMap.rect);
 	faceRectContainer = new Sprite;
 	mc.addChild(faceRectContainer);
 	//end
@@ -102,13 +105,18 @@ private function setupCamera():void
 	colG.addItem(but3);
 	colG.addItem(clicable);
 	colG.alphaThreshold=.1;
+	
 }	
 //begin facial recognition
-private function cameraReadyHandler( event:Event ):void
-{		if(detectionMap!=null && detector!=null){
+private function cameraReadyHandler( event:Event ):Boolean
+{		
+		var detect:Boolean;
 		detectionMap.draw(vid,drawMatrix,null,"normal",null,true);
-		detector.detect( detectionMap );
-		}
+		detect=detector.detect( detectionMap );
+		
+	return(detect);
+		
+		
 }	
 private function initDetector():void
 {
@@ -120,7 +128,8 @@ private function initDetector():void
 		detector.addEventListener(ObjectDetectorEvent.DETECTION_COMPLETE, detectionHandler );
 }
 private function detectionHandler( e :ObjectDetectorEvent ):void
-{
+{			
+			
 			var g :Graphics = faceRectContainer.graphics;
 			g.clear();
 			if( e.rects ){
@@ -128,7 +137,10 @@ private function detectionHandler( e :ObjectDetectorEvent ):void
 				e.rects.forEach( function( r :Rectangle, idx :int, arr :Array ) :void {
 					g.drawRect( r.x * scaleFactor, r.y * scaleFactor, r.width * scaleFactor, r.height * scaleFactor );
 				});
+			
 			}
+			
+
 			
 }
 //end facial recognition		
@@ -158,7 +170,14 @@ private function goImages(e:Event):void
 		paint.threshold(arrayMat[i], paint.rect, paint.rect.topLeft, "==",  0xFFFF0000, (255<<24 | 0<<16 |g<<16 | 0), 0x00FFFFFF, false);
 	}
 	bm.bitmapData=paint;
-	cols()
+	cols();
+
+	//if(!detectionCountCheck){
+		
+	detectionCountCheck=cameraReadyHandler(e);
+	
+	
+	//}
 	
 }
 
@@ -175,16 +194,17 @@ private  function cols():void
 		if(collisions[0].object1.name=="clicable"){
 			collisions[0].object1.over=true;
 		}
-		
+		//He modificado las colisiones a 7 ya que con 15 y el face recognition va muy lento
 		if(collisions[0].object1.name!="clicable" && botonaux==nombre){
-			 if(colisiones>15){
+			 if(colisiones>9){
 							
 				myBottomClickhandler(new MouseEvent(MouseEvent.CLICK));
 				colisiones=0;
 			}
 			
-			if(colisiones<=15){
+			if(colisiones<=9){
 				colisiones++;
+				trace(colisiones);
 			}
 		
 		}
@@ -204,10 +224,6 @@ private  function cols():void
 	}
 }
 
-private function alert():void{
-	import mx.controls.*;
-	Alert.show("Hello, world!");
-}	
 
 private function myBottomClickhandler(evento:MouseEvent):void{
 	import mx.controls.*;
