@@ -3,9 +3,6 @@
 <mx:Script source="AirToyY.as" />
 
 	<mx:Canvas left="0" top="0" bottom="0" right="0" id="hd">
-		
-
-
 	</mx:Canvas>
 
 		<mx:Button x="23" y="10" label="Saluda" id="but" width="154" height="96"/>
@@ -13,5 +10,6 @@
 		<mx:Button x="514" y="49" label="Bot3" id="but3"/>
 		
 	<comps:clicable id="clicable" right="10" top="10" width="100"/>
+	<comps:feedback id="feedback" width="100" x="23" y="86"/>
 
 </mx:WindowedApplication>
