@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="init()">
+
+	<mx:Script>
+		<![CDATA[
+			import Events.ColisionsEvent;
+			[Bindable]private var porcentaje:Number;
+			
+			public function init():void
+			{
+				porcentaje=0;
+				
+				//addEventListener(ColisionsEvent.COLISION, control);
+				trace("init");
+			
+			}
+			
+			public function set object($object:DisplayObject):void
+			{
+				//object.verticalCenter=0;
+				//object.horizontalCenter=0;
+			//	_object=$object;
+				//canvasUp.addChild(_object);
+			}
+			
+			public function set selected($selected:Boolean):void
+			{
+				//_selected=$selected;
+				//trace(_selected);
+			}
+			
+			public function set over($over:Boolean):void
+			{/*
+				_over=$over;
+				if(_over){
+					if(t.currentCount==0){
+						t.start();
+					}
+				}*/
+			}
+			
+			public function control(e:Event):void
+			{
+				porcentaje++;
+				trace("porcentaje: "+porcentaje);
+			}
+			
+			private function progress(e:TimerEvent):void
+			{
+				/*
+				porcentaje=Math.round(t.currentCount/2);
+				pbar.setProgress(porcentaje, 100);
+				//trace(porcentaje);
+				*/
+			}
+			
+			private function complete(e:TimerEvent):void
+			{
+				//_selected=true;
+			}
+			
+		]]>
+	</mx:Script>
+
+	<mx:Canvas id="canvasUp" x="0" width="100%" height="90%" top="0">
+	</mx:Canvas>
+	<mx:ProgressBar id="pbar" x="0" width="100%" height="10%" bottom="0" mode="manual" labelPlacement="center" label="{porcentaje+' %'}"/>
+	
+</mx:Canvas>
