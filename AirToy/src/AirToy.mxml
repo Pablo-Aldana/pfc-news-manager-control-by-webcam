@@ -2,14 +2,11 @@
 <mx:WindowedApplication xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" creationComplete="AirToyX()" xmlns:comps="comps.*">
 <mx:Script source="AirToyY.as" />
 
-	<mx:Canvas left="0" top="0" bottom="0" right="0" id="hd">
-	</mx:Canvas>
-
-		<mx:Button x="23" y="10" label="Saluda" id="but" width="154" height="96"/>
-		<mx:Button x="269" y="23" label="Bot2" id="but2" width="164" height="74"/>
-		<mx:Button x="514" y="49" label="Bot3" id="but3"/>
+	<mx:Canvas left="0" top="0" bottom="0" right="0" id="canvasPrincipal">
 		
-	<comps:clicable id="clicable" right="10" top="10" width="100"/>
-	<comps:feedback id="feedback" width="100" x="23" y="86"/>
-
+	</mx:Canvas>
+	<comps:feedback id="feedback"  x="10" y="10"/>
+	<comps:feedback id="feedback2"  x="350" y="10"/>
+	
+	
 </mx:WindowedApplication>
