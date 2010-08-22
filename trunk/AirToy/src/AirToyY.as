@@ -1,62 +1,46 @@
-import Events.ColisionsEvent;
+import comps.feedback;
 
-import collision.CollisionGroup;
-
-import flash.display.Bitmap;
 import flash.display.BitmapData;
-import flash.display.Shape;
-import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
-import flash.geom.Matrix;
-import flash.media.Camera;
-import flash.media.Video;
 
-import mx.core.UIComponent;
-
-import utils.FaceDetector;
+import utils.SetupCamera;
 	
 
 [SWF(width="640", height="480", frameRate="30", backgroundColor="#FFFFFF")]
 
-private var colG:CollisionGroup;
-private var vid:Video;
-private var cam:Camera;
-private var bmd:BitmapData;
-private var arrayMat:Array;
-private var matr:Matrix;
-private var currentCap:BitmapData;
-private var prevCap:BitmapData;
+
+
+
 private var auxCap:BitmapData;
 private var lon:Number;
-private var paint:BitmapData;
-private var mc:UIComponent;
-private var bm:Bitmap;
-private var bm2:Bitmap;
 private var collisions:Array;
-private var color:uint;
-private var outline:Shape;
 private var nombre:String;
-private var colisiones:int;
 
-private var detectionMap:BitmapData;
-		private var drawMatrix:Matrix;
-		private var scaleFactor:int = 4;
-		private var w:int = 640;
-		private var h:int = 480;
-		private var faceRectContainer :Sprite;
-		private var detectionCountCheck:Boolean;
-		private var Face:FaceDetector;
-		
+private var camera:SetupCamera;
+private var detectionCountCheck:Boolean;
+private var arrayFeedback:Array=new Array(2);;
+
+//private var fd:feed;	
 public function AirToyX():void
 {
-	setupCamera();
+/*	fd=new feed("but");
+	fd.x=300;
+	fd.y=10;
+	this.addChild(fd);*/
+	
+		arrayFeedback[0]=feedback;
+		arrayFeedback[1]=feedback2;
+		
+	
+	
+	camera= new SetupCamera(canvasPrincipal,arrayFeedback);
 	addEventListener(Event.ENTER_FRAME, goImages);
-	Face=new FaceDetector(detectionMap,drawMatrix,faceRectContainer,vid);
+	
 	
 	
 }
-		
+	/*	
 private function setupCamera():void
 {
 	vid = new Video(640, 480);
@@ -95,93 +79,51 @@ private function setupCamera():void
 	colG.addItem(clicable);
 	colG.alphaThreshold=.1;
 	
-}	
+}	*/
 	
 private function goImages(e:Event):void
 {
-	currentCap.draw(vid);
-	auxCap = currentCap.clone();
-	auxCap.draw(prevCap, null, null, "difference");
+		
+	camera.getCurrentCap().draw(camera.getVid());
+	auxCap = camera.getCurrentCap().clone();
+	auxCap.draw(camera.getPrevCap(), null, null, "difference");
 	auxCap.threshold(auxCap, auxCap.rect, auxCap.rect.topLeft, ">", 0xFF555555, 0xFFFF0000, 0x00FFFFFF, false);
-	arrayMat.push(auxCap);
-	if(arrayMat.length >8)
+	camera.getArrayMat().push(auxCap);
+	if(camera.getArrayMat().length >8)
 	{
-		arrayMat.shift().dispose();
+		camera.getArrayMat().shift().dispose();
 	}
-	lon=arrayMat.length;
+	lon=camera.getArrayMat().length;
 	var cada:Number=255/lon;
 	var g:Number;
-	prevCap=currentCap.clone();
+	camera.setPrevCap(camera.getCurrentCap().clone());
 	
-	paint.fillRect(paint.rect, 0x00FF0000);
+	camera.getPaint().fillRect(camera.getPaint().rect, 0x00FF0000);
 	
 
 			
 	for(var i:Number=0; i<lon; i++)
 	{
 		g=cada*i;
-		paint.threshold(arrayMat[i], paint.rect, paint.rect.topLeft, "==",  0xFFFF0000, (255<<24 | 0<<16 |g<<16 | 0), 0x00FFFFFF, false);
+		camera.getPaint().threshold(camera.getArrayMat()[i], camera.getPaint().rect, camera.getPaint().rect.topLeft, "==",  0xFFFF0000, (255<<24 | 0<<16 |g<<16 | 0), 0x00FFFFFF, false);
 	}
-	bm.bitmapData=paint;
-	cols();
-
-	//if(!detectionCountCheck){
-		
-	detectionCountCheck=Face.cameraReadyHandler(e);
 	
-
-	//}
 	
-}
-
-private  function cols():void
-{
-		///////////COLISIONES
-	collisions = colG.checkCollisions();
-
+	camera.getBm().bitmapData=camera.getPaint();
 	
-	var botonaux:String;
-	for(var i:uint = 0; i < collisions.length; i++){
-		if(detectionCountCheck){
-		collisions[0].object1.selected=true;
-		}
-		botonaux=collisions[0].object1.name;
-		if(collisions[0].object1.name=="clicable"){
-			collisions[0].object1.over=true;
-			
-		}
-		//He modificado las colisiones a 7 ya que con 15 y el face recognition va muy lento
-		if(collisions[0].object1.name!="clicable" && botonaux==nombre && collisions[0].object1.selected){
-			 if(colisiones>9){
-							
-				myBottomClickhandler(new MouseEvent(MouseEvent.CLICK));
-				colisiones=0;
-				
-			}
-			
-			if(colisiones<=9){
-				colisiones++;
-				//dispatchEvent(new ColisionsEvent(ColisionsEvent.COLISION));
-				
-				feedback.control(new ColisionsEvent(ColisionsEvent.COLISION));
-			}
-		
-		}
-
-
-	}
-	if(!collisions.length)
+	detectionCountCheck=camera.getFaceDetect().cameraReadyHandler(e);
+	for(var j:uint=0;j<2;j++)
 	{
-		but.selected=false;
-		but2.selected=false;
-		but3.selected=false;
+		arrayFeedback[j].cols(detectionCountCheck,(camera.getColG().checkCollisions()),arrayFeedback);
+	}
+
+	
+	
 		
-	}
-	if(botonaux!=nombre){
-			nombre=botonaux;
-			colisiones=0;
-	}
 }
+
+
+
 
 
 private function myBottomClickhandler(evento:MouseEvent):void{
