@@ -1,0 +1,1 @@
+Final project about News manager that can be controller by webcam using RIA tecnology.
